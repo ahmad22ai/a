@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>مترجم فوري · صوت وكتابة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Tajawal', 'Cairo', 'Arial', sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 680px;
+            width: 100%;
+            background: white;
+            padding: 24px 20px 30px 20px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: black;
+            margin-bottom: 16px;
+        }
+
+        .lang-pair {
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            margin: 15px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .lang-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-select {
+            background: white;
+            border: 1.5px solid black;
+            border-radius: 0px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: black;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: center;
+            width: 140px;
+        }
+
+        .lang-square {
+            width: 110px;
+            height: 110px;
+            border-radius: 0px;
+            background: white;
+            border: 2px solid black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.1s;
+            gap: 6px;
+        }
+
+        .lang-square:active { transform: scale(0.97); background-color: #f5f5f5; }
+        .lang-square.active { background: #d1d5db; }
+        .lang-flag { font-size: 2.5rem; }
+        .lang-name { font-size: 0.85rem; font-weight: bold; }
+
+        .mic-btn {
+            width: 100%;
+            background: white;
+            border: 2px solid black;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 12px 0 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.1s;
+        }
+        .mic-btn.recording { background: #e5e7eb; }
+
+        /* مربع النص القابل للتحرير (بدون زر رفع) */
+        .editable-box {
+            border: 1px solid black;
+            background: white;
+            margin-bottom: 18px;
+        }
+        .text-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #ccc;
+            background: #fafafa;
+        }
+        .result-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: black;
+        }
+        .text-content {
+            padding: 14px;
+            min-height: 120px;
+        }
+        #sourceTextArea {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            background: white;
+            color: black;
+            text-align: right;
+            line-height: 1.5;
+        }
+        #sourceTextArea:focus { border: none; outline: none; }
+
+        .result-box {
+            background: white;
+            border-radius: 0px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border: 1px solid black;
+        }
+        .result-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            word-break: break-word;
+            text-align: left;
+            color: black;
+        }
+        .status-msg {
+            font-size: 0.75rem;
+            background: #f5f5f5;
+            display: inline-block;
+            padding: 4px 14px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            color: black;
+        }
+        .developer-signature {
+            margin-top: 22px;
+            padding-top: 12px;
+            border-top: 1px solid #ccc;
+            font-size: 0.8rem;
+            text-align: center;
+            color: #333;
+        }
+        .developer-signature span {
+            font-weight: 700;
+            color: black;
+        }
+        @media (max-width: 550px) {
+            .lang-square { width: 90px; height: 90px; }
+            .lang-flag { font-size: 2rem; }
+            .lang-select { width: 120px; font-size: 0.7rem; }
+            .mic-btn { padding: 12px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="page-header">
+        <h1>📝 مترجم فوري · اكتب أو تحدث</h1>
+    </div>
+
+    <div class="lang-pair">
+        <div class="lang-control">
+            <select id="sourceSelect" class="lang-select"></select>
+            <div class="lang-square" id="sourceSquare">
+                <div class="lang-flag" id="sourceFlag">🇸🇦</div>
+                <div class="lang-name" id="sourceLangName">العربية</div>
+            </div>
+        </div>
+        <div class="lang-control">
+            <select id="targetSelect" class="lang-select"></select>
+            <div class="lang-square" id="targetSquare">
+                <div class="lang-flag" id="targetFlag">🇩🇪</div>
+                <div class="lang-name" id="targetLangName">Deutsch</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="status" class="status-msg">اختر اللغة · اكتب أو استخدم الميكروفون</div>
+    <button class="mic-btn" id="micButton">🎙️ اضغط وتحدث</button>
+
+    <!-- مربع النص القابل للتحرير (بدون أي أزرار رفع) -->
+    <div class="editable-box">
+        <div class="text-header">
+            <span class="result-label">✍️ النص المصدر (اكتب أو الصق)</span>
+        </div>
+        <div class="text-content">
+            <textarea id="sourceTextArea" rows="4" placeholder="اكتب أو الصق النص هنا ... سيتم ترجمته تلقائياً"></textarea>
+        </div>
+    </div>
+
+    <div class="result-box">
+        <div class="result-label">🌐 الترجمة الفورية</div>
+        <div class="result-text" id="translatedText">...</div>
+    </div>
+
+    <div class="developer-signature">
+        <span>⚡ Ahmad22ai</span> · ترجمة صوتية + نصوص فورية
+    </div>
+</div>
+
+<script>
+    // ------------------- قائمة اللغات (الأسماء الأصلية) ------------------
+    const languages = [
+        { code: "ar", nativeName: "العربية", flag: "🇸🇦", displayName: "العربية", speechCode: "ar-SA" },
+        { code: "de", nativeName: "Deutsch", flag: "🇩🇪", displayName: "Deutsch", speechCode: "de-DE" },
+        { code: "en", nativeName: "English", flag: "🇺🇸", displayName: "English", speechCode: "en-US" },
+        { code: "fr", nativeName: "Français", flag: "🇫🇷", displayName: "Français", speechCode: "fr-FR" },
+        { code: "es", nativeName: "Español", flag: "🇪🇸", displayName: "Español", speechCode: "es-ES" },
+        { code: "it", nativeName: "Italiano", flag: "🇮🇹", displayName: "Italiano", speechCode: "it-IT" },
+        { code: "tr", nativeName: "Türkçe", flag: "🇹🇷", displayName: "Türkçe", speechCode: "tr-TR" },
+        { code: "ru", nativeName: "Русский", flag: "🇷🇺", displayName: "Русский", speechCode: "ru-RU" },
+        { code: "zh", nativeName: "中文", flag: "🇨🇳", displayName: "中文", speechCode: "zh-CN" },
+        { code: "ja", nativeName: "日本語", flag: "🇯🇵", displayName: "日本語", speechCode: "ja-JP" },
+        { code: "ko", nativeName: "한국어", flag: "🇰🇷", displayName: "한국어", speechCode: "ko-KR" },
+        { code: "nl", nativeName: "Nederlands", flag: "🇳🇱", displayName: "Nederlands", speechCode: "nl-NL" },
+        { code: "pt", nativeName: "Português", flag: "🇵🇹", displayName: "Português", speechCode: "pt-PT" },
+        { code: "pl", nativeName: "Polski", flag: "🇵🇱", displayName: "Polski", speechCode: "pl-PL" },
+        { code: "uk", nativeName: "Українська", flag: "🇺🇦", displayName: "Українська", speechCode: "uk-UA" },
+        { code: "fa", nativeName: "فارسی", flag: "🇮🇷", displayName: "فارسی", speechCode: "fa-IR" }
+    ];
+
+    // DOM elements
+    const sourceSelect = document.getElementById('sourceSelect');
+    const targetSelect = document.getElementById('targetSelect');
+    const sourceSquare = document.getElementById('sourceSquare');
+    const targetSquare = document.getElementById('targetSquare');
+    const sourceFlagSpan = document.getElementById('sourceFlag');
+    const sourceLangNameSpan = document.getElementById('sourceLangName');
+    const targetFlagSpan = document.getElementById('targetFlag');
+    const targetLangNameSpan = document.getElementById('targetLangName');
+    const statusDiv = document.getElementById('status');
+    const micButton = document.getElementById('micButton');
+    const translatedTextDiv = document.getElementById('translatedText');
+    const sourceTextArea = document.getElementById('sourceTextArea');
+
+    let sourceLang = "ar";
+    let targetLang = "de";
+    let isRecording = false;
+    let recognition = null;
+    let currentUtterance = null;
+    let translationTimeout = null;
+    const STORAGE_KEY = "smart_translator_no_files";
+
+    // ------------------- دوال الترجمة ------------------
+    async function translateText(text, fromLang, toLang) {
+        if (!text || text.trim() === "") return "";
+        try {
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            let translation = data[0][0][0];
+            if (!translation) throw new Error();
+            return translation;
+        } catch(e) {
+            console.error(e);
+            return "⚠️ خطأ في الترجمة، تأكد من الاتصال بالإنترنت";
+        }
+    }
+
+    // تحديث الترجمة بناءً على النص الحالي في TextArea
+    async function updateTranslationFromText() {
+        const text = sourceTextArea.value.trim();
+        if (!text) {
+            translatedTextDiv.innerHTML = "...";
+            return;
+        }
+        translatedTextDiv.innerHTML = "⏳ جاري الترجمة...";
+        const translation = await translateText(text, sourceLang, targetLang);
+        translatedTextDiv.innerHTML = translation;
+        // نطق الترجمة تلقائياً (اختياري ولكن مفيد)
+        if (translation && !translation.includes("⚠️") && !translation.includes("خطأ")) {
+            speakText(translation, targetLang);
+        }
+    }
+
+    // عند الكتابة في textarea: ترجمة فورية مع تأخير بسيط (0.5 ثانية)
+    sourceTextArea.addEventListener('input', () => {
+        if (translationTimeout) clearTimeout(translationTimeout);
+        translationTimeout = setTimeout(() => {
+            updateTranslationFromText();
+        }, 500);
+    });
+
+    // ------------------- دوال اللغات والميكروفون ------------------
+    function populateSelects() {
+        languages.forEach(lang => {
+            const optSrc = document.createElement('option');
+            optSrc.value = lang.code;
+            optSrc.textContent = `${lang.flag} ${lang.nativeName}`;
+            sourceSelect.appendChild(optSrc);
+            const optTgt = document.createElement('option');
+            optTgt.value = lang.code;
+            optTgt.textContent = `${lang.flag} ${lang.nativeName}`;
+            targetSelect.appendChild(optTgt);
+        });
+    }
+
+    function getLangByCode(code) {
+        return languages.find(l => l.code === code) || languages[0];
+    }
+
+    function updateSourceUI() {
+        const langObj = getLangByCode(sourceLang);
+        sourceFlagSpan.textContent = langObj.flag;
+        sourceLangNameSpan.textContent = langObj.nativeName;
+        if (sourceSelect.value !== sourceLang) sourceSelect.value = sourceLang;
+    }
+    function updateTargetUI() {
+        const langObj = getLangByCode(targetLang);
+        targetFlagSpan.textContent = langObj.flag;
+        targetLangNameSpan.textContent = langObj.nativeName;
+        if (targetSelect.value !== targetLang) targetSelect.value = targetLang;
+    }
+    function setBothActive() {
+        sourceSquare.classList.add('active');
+        targetSquare.classList.add('active');
+    }
+    function savePrefs() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ sourceLang, targetLang })); }
+    function loadPrefs() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if(saved) {
+            try {
+                const p = JSON.parse(saved);
+                if(languages.some(l=>l.code===p.sourceLang)) sourceLang = p.sourceLang;
+                if(languages.some(l=>l.code===p.targetLang)) targetLang = p.targetLang;
+            } catch(e) {}
+        }
+        if(sourceLang === targetLang) {
+            const other = languages.find(l=>l.code !== sourceLang);
+            if(other) targetLang = other.code;
+        }
+        updateSourceUI(); updateTargetUI(); setBothActive(); updateStatusMsg();
+    }
+    function updateStatusMsg() {
+        const src = getLangByCode(sourceLang);
+        const tgt = getLangByCode(targetLang);
+        statusDiv.innerHTML = `${src.nativeName} → ${tgt.nativeName} | تحدث أو اكتب`;
+    }
+
+    function onSourceChange() {
+        const newCode = sourceSelect.value;
+        if(newCode === targetLang) {
+            alert("⚠️ لا يمكن تطابق المصدر والهدف، تم تبديل الهدف تلقائياً.");
+            const alt = languages.find(l=>l.code !== newCode);
+            if(alt) targetLang = alt.code;
+            updateTargetUI(); targetSelect.value = targetLang;
+        }
+        sourceLang = newCode;
+        updateSourceUI(); setBothActive(); updateStatusMsg(); savePrefs();
+        if(isRecording) stopRecording();
+        updateTranslationFromText();
+    }
+    function onTargetChange() {
+        const newCode = targetSelect.value;
+        if(newCode === sourceLang) {
+            alert("⚠️ لا يمكن تطابق الهدف والمصدر، تم تبديل المصدر تلقائياً.");
+            const alt = languages.find(l=>l.code !== newCode);
+            if(alt) sourceLang = alt.code;
+            updateSourceUI(); sourceSelect.value = sourceLang;
+        }
+        targetLang = newCode;
+        updateTargetUI(); setBothActive(); updateStatusMsg(); savePrefs();
+        if(isRecording) stopRecording();
+        updateTranslationFromText();
+    }
+
+    sourceSelect.addEventListener('change', onSourceChange);
+    targetSelect.addEventListener('change', onTargetChange);
+    
+    // مبادلة اللغات عند النقر على المربعات
+    sourceSquare.addEventListener('click', () => {
+        [sourceLang, targetLang] = [targetLang, sourceLang];
+        updateSourceUI(); updateTargetUI();
+        sourceSelect.value = sourceLang; targetSelect.value = targetLang;
+        setBothActive(); updateStatusMsg(); savePrefs();
+        if(isRecording) stopRecording();
+        updateTranslationFromText();
+    });
+    targetSquare.addEventListener('click', () => {
+        [sourceLang, targetLang] = [targetLang, sourceLang];
+        updateSourceUI(); updateTargetUI();
+        sourceSelect.value = sourceLang; targetSelect.value = targetLang;
+        setBothActive(); updateStatusMsg(); savePrefs();
+        if(isRecording) stopRecording();
+        updateTranslationFromText();
+    });
+
+    // نطق النص (TTS)
+    function speakText(text, langCode) {
+        if(!window.speechSynthesis) return;
+        if(currentUtterance) { window.speechSynthesis.cancel(); currentUtterance=null; }
+        const utterance = new SpeechSynthesisUtterance(text);
+        const langObj = getLangByCode(langCode);
+        let voiceLang = langObj.speechCode || langCode;
+        if(langCode === "fa") voiceLang = "fa-IR";
+        if(langCode === "uk") voiceLang = "uk-UA";
+        if(langCode === "pl") voiceLang = "pl-PL";
+        utterance.lang = voiceLang;
+        utterance.rate = 0.9;
+        currentUtterance = utterance;
+        utterance.onend = () => { currentUtterance = null; };
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // التعرف على الصوت (الإملاء)
+    async function startRecording() {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!SpeechRec) { alert("❌ متصفحك لا يدعم التعرف على الصوت. استخدم Chrome أو Edge."); return; }
+        recognition = new SpeechRec();
+        const langObj = getLangByCode(sourceLang);
+        let recogLang = langObj.speechCode || sourceLang;
+        if(sourceLang === "fa") recogLang = "fa-IR";
+        if(sourceLang === "uk") recogLang = "uk-UA";
+        if(sourceLang === "pl") recogLang = "pl-PL";
+        recognition.lang = recogLang;
+        recognition.interimResults = false;
+        recognition.continuous = false;
+        
+        recognition.onstart = () => {
+            isRecording = true;
+            micButton.classList.add('recording');
+            micButton.innerText = "⏹️ جاري الاستماع ... تحدث الآن";
+        };
+        recognition.onresult = async (event) => {
+            const spoken = event.results[0][0].transcript;
+            sourceTextArea.value = spoken;
+            await updateTranslationFromText();
+        };
+        recognition.onerror = (ev) => {
+            console.warn(ev.error);
+            let errMsg = "❌ لم يتم التعرف";
+            if(ev.error === "not-allowed") errMsg = "❌ يُرجى السماح بالوصول إلى الميكروفون";
+            else if(ev.error === "no-speech") errMsg = "❌ لم يتم سماع أي صوت، حاول مرة أخرى";
+            sourceTextArea.value = errMsg;
+            stopRecording();
+        };
+        recognition.onend = () => { if(isRecording) stopRecording(); };
+        recognition.start();
+    }
+    
+    function stopRecording() {
+        if(recognition) { try{ recognition.stop(); }catch(e){} recognition=null; }
+        isRecording = false;
+        micButton.classList.remove('recording');
+        micButton.innerText = "🎙️ اضغط وتحدث";
+    }
+    
+    micButton.onclick = () => {
+        if(isRecording) stopRecording();
+        else startRecording();
+    };
+    
+    window.addEventListener("beforeunload", () => {
+        if(recognition && isRecording) stopRecording();
+        if(window.speechSynthesis) window.speechSynthesis.cancel();
+    });
+    
+    // اختبار صلاحية الميكروفون (بدون إزعاج)
+    async function checkMicrophone() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach(t => t.stop());
+        } catch(e) { console.warn("ميكروفون غير متاح أو لم يُسمح"); }
+    }
+    checkMicrophone();
+    
+    // ------------------- التهيئة النهائية ------------------
+    populateSelects();
+    loadPrefs();
+    setBothActive();
+    updateStatusMsg();
+    sourceTextArea.value = "";   // بداية فارغة
+    translatedTextDiv.innerHTML = "...";
+    
+    // إعادة الترجمة عند تغيير اللغة (لنص موجود)
+    const reTranslateOnLangChange = () => {
+        if(sourceTextArea.value.trim() !== "") updateTranslationFromText();
+    };
+    sourceSelect.addEventListener('change', reTranslateOnLangChange);
+    targetSelect.addEventListener('change', reTranslateOnLangChange);
+</script>
+</body>
+</html>
