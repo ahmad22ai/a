@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نسبة الحب 💕 - بروفايل تيك توك</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    html, body { 
+        height: 100vh;
+        overflow: hidden;
+        background: transparent; /* خلفية شفافة تماماً لتناسب الـ OBS أو البث */
+        color: #eee; 
+    }
+
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        position: relative;
+    }
+
+    .container { 
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 620px; 
+        max-height: 98vh;
+        background: rgba(30, 30, 30, 0.95); 
+        border-radius: 22px; 
+        box-shadow: 0 0 40px rgba(255, 0, 64, 0.3); 
+        overflow: hidden; 
+        border: 1px solid #ff0040;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header { 
+        background: linear-gradient(to right, #ff0040, #8e2de2); 
+        color: white; 
+        padding: 14px 20px; 
+        text-align: center; 
+        flex-shrink: 0;
+    }
+
+    header h1 { font-size: 1.35rem; margin-bottom: 3px; }
+    header p { opacity: 0.9; font-size: 0.82rem; }
+
+    .content {
+        padding: 16px 22px 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    /* تم إخفاء خانات الإدخال اليدوي لأن التفاعل أصبح تلقائياً عبر البث */
+    .input-group {
+        display: none !important;
+    }
+
+    .btn-love {
+        display: none !important;
+    }
+
+    .result-zone {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .result-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        gap: 4px;
+    }
+
+    .tiktok-nickname {
+        color: #ff6b9d;
+        text-align: center;
+        font-size: 1.05rem;
+        font-weight: bold;
+        letter-spacing: 0.3px;
+        min-height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 3px 14px;
+        border-radius: 20px;
+        background: rgba(255, 0, 64, 0.12);
+        border: 1px solid rgba(255, 0, 64, 0.35);
+        transition: opacity 0.4s;
+        opacity: 0;
+    }
+
+    .tiktok-nickname.show { opacity: 1; }
+
+    .tiktok-nickname .tiktok-icon {
+        font-size: 0.9rem;
+        color: #fff;
+        background: #ff0040;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .love-names {
+        color: #fff;
+        text-align: center;
+        font-size: 1.15rem;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        min-height: 30px;
+        line-height: 1.2;
+    }
+
+    .love-names .name-text { color: #ffffff; }
+    .love-names .heart-icon { color: #ff6b9d; font-size: 1.1rem; }
+
+    .love-percent {
+        font-size: 2.8rem;
+        font-weight: bold;
+        background: linear-gradient(90deg, #ff0040, #ff6b9d, #ff0040);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+        line-height: 1;
+        min-height: 2.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .love-percent.celebrate {
+        animation: percentPulse 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes percentPulse {
+        from { transform: scale(1); filter: brightness(1); }
+        to { transform: scale(1.12); filter: brightness(1.4); }
+    }
+
+    .heart-beat-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 210px;
+        width: 210px;
+        margin: 0 auto;
+        flex-shrink: 0;
+    }
+
+    .heart-beat {
+        position: relative;
+        width: 210px;
+        height: 210px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: heartbeat 1.2s ease-in-out infinite;
+        cursor: pointer;
+        user-select: none;
+        filter: 
+            drop-shadow(0 0 3px #ff0040)
+            drop-shadow(0 0 5px #ff0040)
+            drop-shadow(0 0 8px #ff0033)
+            drop-shadow(0 0 12px rgba(255, 0, 64, 0.9));
+    }
+
+    .heart-shape {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: #ff0040;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        clip-path: path('M 105 190 C 40 140 0 100 0 60 C 0 25 25 0 55 0 C 78 0 95 14 105 32 C 115 14 132 0 155 0 C 185 0 210 25 210 60 C 210 100 170 140 105 190 Z');
+        -webkit-clip-path: path('M 105 190 C 40 140 0 100 0 60 C 0 25 25 0 55 0 C 78 0 95 14 105 32 C 115 14 132 0 155 0 C 185 0 210 25 210 60 C 210 100 170 140 105 190 Z');
+        z-index: 1;
+        transition: background-image 0.5s ease, background-color 0.5s ease;
+    }
+
+    .spinner {
+        width: 44px;
+        height: 44px;
+        border: 4px solid rgba(255,255,255,0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        position: absolute;
+        z-index: 3;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes heartbeat {
+        0%   { transform: scale(1); }
+        14%  { transform: scale(1.15); }
+        28%  { transform: scale(1); }
+        42%  { transform: scale(1.15); }
+        70%  { transform: scale(1); }
+        100% { transform: scale(1); }
+    }
+
+    .love-message {
+        color: #ff6b9d;
+        text-align: center;
+        font-size: 0.95rem;
+        font-style: italic;
+        padding: 8px 16px;
+        border-radius: 10px;
+        background: rgba(255, 0, 64, 0.1);
+        border: 1px solid rgba(255, 0, 64, 0.3);
+        max-width: 100%;
+        line-height: 1.35;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #fireworksCanvas {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 99999;
+        display: none;
+        background: transparent;
+    }
+
+    #fireworksCanvas.active { display: block; }
+</style>
+</head>
+<body>
+
+<canvas id="fireworksCanvas"></canvas>
+
+<div class="container">
+    <header>
+        <h1>💕 نسبة الحب 💕</h1>
+        <p>تفاعل بالوردة أو إشارة تيك توك واكتب اسمين في التعليقات</p>
+    </header>
+
+    <div class="content">
+        <div class="result-zone">
+            <div class="result-card" id="luckResult">
+
+                <div class="tiktok-nickname" id="tiktokNickname">
+                    <span class="tiktok-icon">♪</span>
+                    <span id="tiktokNicknameText">أرسل هدية وابدأ</span>
+                </div>
+
+                <div class="love-names" id="loveNamesDisplay">
+                    <span class="name-text">اسم الأول</span>
+                    <span class="heart-icon">❤</span>
+                    <span class="name-text">اسم الثاني</span>
+                </div>
+
+                <div class="love-percent" id="lovePercent">0%</div>
+
+                <div class="heart-beat-wrapper">
+                    <div class="heart-beat" id="heartBeat" title="نبض الحب">
+                        <div class="heart-shape" id="heartShape"></div>
+                        <div class="spinner" id="heartSpinner" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <div class="love-message" id="loveMessage">أرسل "وردة" أو "إشارة" واكتب الاسم الأول والاسم الثاني في التعليقات!</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateLovePercent(name1, name2, username) {
+    const combined = (name1 + '|' + name2 + '|' + username).toLowerCase().trim();
+    let hash = 0;
+    for (let i = 0; i < combined.length; i++) {
+        hash = (hash * 31 + combined.charCodeAt(i)) % 1000000007;
+    }
+    const roll = hash % 100;
+    if (roll < 8) return 99 + (hash % 2);
+    else if (roll < 20) return 90 + (hash % 9);
+    else return 50 + (hash % 40);
+}
+
+function getLoveMessage(percent) {
+    if (percent === 100) return '💘 حب مكتمل 100%! أنتما خُلقتما لبعضكما';
+    if (percent >= 95) return '💞 حب أسطوري! أنتما توأمان روحان';
+    if (percent >= 85) return '💖 حب حقيقي! علاقة قوية ومستقرة';
+    if (percent >= 75) return '💕 حب جميل! تحتاجان فقط بعض الوقت';
+    if (percent >= 65) return '💗 علاقة واعدة! استمرا في التعرف';
+    if (percent >= 50) return '💓 هناك شيء بينكما! اعملوا عليه';
+    return '💔 الصداقة أفضل بينكما';
+}
+
+let percentAnimFrame = null;
+function animatePercent(targetPercent, duration = 2000, onDone) {
+    const el = document.getElementById('lovePercent');
+    if (percentAnimFrame) cancelAnimationFrame(percentAnimFrame);
+    const start = performance.now();
+    
+    function step(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(eased * targetPercent);
+        el.innerHTML = current + '%';
+        if (progress < 1) {
+            percentAnimFrame = requestAnimationFrame(step);
+        } else {
+            el.innerHTML = targetPercent + '%';
+            percentAnimFrame = null;
+            if (typeof onDone === 'function') onDone();
+        }
+    }
+    percentAnimFrame = requestAnimationFrame(step);
+}
+
+async function fetchTikTokProfile(username) {
+    username = username.replace('@', '').trim();
+    let nickname = '@' + username;
+    let avatar = `https://unavatar.io/tiktok/${encodeURIComponent(username)}`;
+    try {
+        const res = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent('https://www.tiktok.com/@' + username)}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.author_name) nickname = data.author_name;
+            if (data.thumbnail_url) avatar = data.thumbnail_url;
+        }
+    } catch(e) {}
+    return { nickname, avatar, username };
+}
+
+function applyHeartBackground(imageUrl) {
+    const heartShape = document.getElementById('heartShape');
+    const testImg = new Image();
+    testImg.crossOrigin = 'anonymous';
+    testImg.onload = function() {
+        heartShape.style.backgroundImage = `url('${imageUrl}')`;
+        heartShape.style.backgroundColor = 'transparent';
+    };
+    testImg.onerror = function() {
+        heartShape.style.backgroundColor = '#ff0040';
+    };
+    testImg.src = imageUrl;
+}
+
+const Fireworks = (function() {
+    const canvas = document.getElementById('fireworksCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [], animationId = null, isRunning = false, spawnTimer = null;
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+    const colors = ['#ff0040', '#ff6b9d', '#ffcc00', '#ff8c00', '#00e5ff', '#8e2de2', '#ffffff'];
+    
+    function createExplosion(x, y) {
+        const count = 60;
+        for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count;
+            const speed = 2 + Math.random() * 4;
+            particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1, decay: 0.015, color: colors[Math.floor(Math.random() * colors.length)], size: 2 });
+        }
+    }
+    function animate() {
+        if (!isRunning) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.life -= p.decay;
+            if (p.life <= 0) { particles.splice(i, 1); continue; }
+            ctx.globalAlpha = p.life;
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+        }
+        animationId = requestAnimationFrame(animate);
+    }
+    function start() {
+        if (isRunning) return;
+        isRunning = true; canvas.classList.add('active'); resize();
+        createExplosion(canvas.width / 2, canvas.height / 3);
+        spawnTimer = setInterval(() => createExplosion(Math.random() * canvas.width, Math.random() * (canvas.height/2)), 600);
+        animate();
+        setTimeout(() => stop(), 10000);
+    }
+    function stop() {
+        isRunning = false; canvas.classList.remove('active');
+        if (spawnTimer) clearInterval(spawnTimer);
+        if (animationId) cancelAnimationFrame(animationId);
+        particles = []; ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    return { start, stop };
+})();
+
+// الوظيفة الأساسية لتشغيل النسبة وتحديث الواجهة تلقائياً عند وصول البيانات
+async function triggerLoveCheck(username, name1, name2) {
+    if (!username || !name1 || !name2) return;
+
+    Fireworks.stop();
+    const percent = calculateLovePercent(name1, name2, username);
+    const message = getLoveMessage(percent);
+
+    const nicknameEl = document.getElementById('tiktokNickname');
+    const nicknameTextEl = document.getElementById('tiktokNicknameText');
+    nicknameEl.classList.remove('show');
+    nicknameTextEl.textContent = '...';
+
+    document.getElementById('loveNamesDisplay').innerHTML = `
+        <span class="name-text">${name1}</span>
+        <span class="heart-icon">❤</span>
+        <span class="name-text">${name2}</span>
+    `;
+
+    if (percent >= 99) {
+        Fireworks.start();
+    }
+
+    animatePercent(percent, 2200);
+    document.getElementById('loveMessage').innerHTML = message;
+
+    const heartShape = document.getElementById('heartShape');
+    const heartSpinner = document.getElementById('heartSpinner');
+    heartSpinner.style.display = 'block';
+    heartShape.style.backgroundImage = 'none';
+    heartShape.style.backgroundColor = '#ff0040';
+
+    try {
+        const profile = await fetchTikTokProfile(username);
+        nicknameTextEl.textContent = profile.nickname;
+        nicknameEl.classList.add('show');
+        applyHeartBackground(profile.avatar);
+    } catch(e) {
+        nicknameTextEl.textContent = '@' + username;
+        nicknameEl.classList.add('show');
+        applyHeartBackground(`https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=ff0040&color=fff&size=512&bold=true`);
+    } finally {
+        heartSpinner.style.display = 'none';
+    }
+}
+
+// استقبال البيانات تلقائياً من أدوات البث أو السكريبت الخارجي (عبر Window Message أو WebSocket)
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'RUN_LOVE') {
+        triggerLoveCheck(event.data.username, event.data.name1, event.data.name2);
+    }
+});
+</script>
+</body>
+</html>
